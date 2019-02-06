@@ -13,9 +13,17 @@ function randomNumber(max, min) {
   return (Math.random() * max) + min;
 }
 
-exports.getCurrentLocation = function(req, res) {
-  currentLocation.x = randomNumber(MAX_LOCATION, MIN_LOCATION);
-  currentLocation.y = randomNumber(MAX_LOCATION, MIN_LOCATION);
-  currentLocation.z = randomNumber(MAX_LOCATION, MIN_LOCATION);
+exports.getRandomLocation = function(req, res) {
+  let min = MIN_LOCATION;
+  let max = MAX_LOCATION;
+  if ('min' in req.query) {
+    min = req.query.min;
+  }
+  if ('max' in req.query) {
+    max = req.query.max;
+  }
+  currentLocation.x = randomNumber(max, min);
+  currentLocation.y = randomNumber(max, min);
+  currentLocation.z = randomNumber(max, min);
   res.json(currentLocation);
 }
