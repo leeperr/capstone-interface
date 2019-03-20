@@ -5,4 +5,8 @@ module.exports = function(app) {
   // location Routes
   app.route('/randomLocation')
     .get(location.getRandomLocation);
+
+  app.route('/location')
+    .get(location.getLocation)
+    .post(location.updateLocation);
 };

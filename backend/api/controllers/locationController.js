@@ -1,9 +1,9 @@
 'use strict';
 
 var currentLocation = {
-  x: 1,
-  y: 1,
-  z: 2
+  x: 0,
+  y: 0,
+  z: 0
 };
 
 const MAX_LOCATION = 3;
@@ -25,5 +25,18 @@ exports.getRandomLocation = function(req, res) {
   currentLocation.x = randomNumber(max, min);
   currentLocation.y = randomNumber(max, min);
   currentLocation.z = randomNumber(max, min);
+  res.json(currentLocation);
+}
+
+exports.updateLocation = function(req, res) {
+  if (!req.body.hasOwnProperty("position")) {
+    res.status(422);
+  } else {
+    currentLocation = req.body.position;
+    res.json("Position Updated");
+  }
+}
+
+exports.getLocation = function(req, res) {
   res.json(currentLocation);
 }
