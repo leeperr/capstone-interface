@@ -73,7 +73,7 @@ var PosterScene = createReactClass({
   getInitialState: function () {
     return {
       loopState: false,
-      animationName: "01",
+      animationName: "scaleModel",
       pauseUpdates: false,
       playAnim: false,
       modelAnim: false,
@@ -94,7 +94,7 @@ var PosterScene = createReactClass({
 
           <ViroNode position={[0, -.1, 0]} scale={[0, 0, 0]} rotation={[-90, 0, 0]} dragType="FixedToWorld" onDrag={() => { }}
             animation={{ name: "scaleModel", run: this.state.playAnim, }} >
-            <Viro3DObject onLoadEnd={this._onModelLoad}
+            <Viro3DObject
               source={require('./res/blackpanther/object_bpanther_anim.vrx')}
               resources={[require('./res/blackpanther/object_bpanther_Base_Color.png'),
               require('./res/blackpanther/object_bpanther_Metallic.png'),
@@ -103,8 +103,10 @@ var PosterScene = createReactClass({
               require('./res/blackpanther/object_bpanther_Roughness.png')]}
               position={currentPosition}
               scale={[.9, .9, .9]}
-              animation={{ name: this.state.animationName, run: this.state.modelAnim, loop: this.state.loopState, onFinish: this._onFinish, interruptible: true, }}
-              type="VRX" />
+              animation={{ name: this.state.animationName, run: this.state.modelAnim, loop: this.state.loopState, onFinish: this._onFinish, }}
+              type="VRX"
+              onLoadEnd={this._onModelLoad}
+               />
 
           </ViroNode>
 
@@ -163,7 +165,7 @@ var PosterScene = createReactClass({
 
   _onFinish() {
     this.setState({
-      animationName: "02",
+      animationName: "scaleModel",
       loopState: true,
     })
   },
@@ -195,6 +197,7 @@ var styles = StyleSheet.create({
   },
 });
 
+//Needed for poster tracking.
 ViroARTrackingTargets.createTargets({
   poster: {
     source: require('./res/blackpanther.jpg'),
@@ -203,10 +206,12 @@ ViroARTrackingTargets.createTargets({
   }
 });
 
+
+//this is where animations are registered
 ViroAnimations.registerAnimations({
   scaleModel: {
     properties: { scaleX: 1, scaleY: 1, scaleZ: 1, },
-    duration: 50
+    duration: 1000
   },
 });
 
