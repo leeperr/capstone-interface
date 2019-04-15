@@ -35,23 +35,49 @@ var createReactClass = require('create-react-class');
 
 var currentPosition = [0, -1.45, 0]
 
-function fetchNextPosition() {
+/*function fetchNextPosition() {
   console.log('fetching');
-  fetch('http://ec2-52-91-195-101.compute-1.amazonaws.com:3000/currentLocation')
+  fetch('http://ec2-52-91-195-101.compute-1.amazonaws.com:3000/location')
     .then(response => response.json())
     .then((responseJson) => {
       console.log(`fetched: ${responseJson}`);
       console.log(responseJson);
-      let movement = Object.assign({}, responseJson);
-      movement = {
-        x: (movement.x / 10) * (Math.random() < 0.5 ? -1 : 1),
-        y: 0, //(movement.y / 10) * (Math.random() < 0.5 ? -1 : 1),
-        z: (movement.z / 10) * (Math.random() < 0.5 ? -1 : 1)
-      }
+      // let movement = Object.assign({}, responseJson);
+      // movement = {
+      //   x: (movement.x / 10) * (Math.random() < 0.5 ? -1 : 1),
+      //   y: 0, //(movement.y / 10) * (Math.random() < 0.5 ? -1 : 1),
+      //   z: (movement.z / 10) * (Math.random() < 0.5 ? -1 : 1)
+      // }
       currentPosition = [
-        currentPosition[0] + movement.x,
-        currentPosition[1] + movement.y,
-        currentPosition[2] + movement.z
+         responseJson.x,
+         responseJson.y,
+         responseJson.z
+      ];
+      console.log('current position', currentPosition);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+*/
+
+function fetchNextPosition() {
+  console.log('fetching');
+  fetch('http://localhost:3030/location')
+    .then(response => response.json())
+    .then((responseJson) => {
+      console.log(`fetched: ${responseJson}`);
+      console.log(responseJson);
+      // let movement = Object.assign({}, responseJson);
+      // movement = {
+      //   x: (movement.x / 10) * (Math.random() < 0.5 ? -1 : 1),
+      //   y: 0, //(movement.y / 10) * (Math.random() < 0.5 ? -1 : 1),
+      //   z: (movement.z / 10) * (Math.random() < 0.5 ? -1 : 1)
+      // }
+      currentPosition = [
+         responseJson.x,
+         responseJson.y,
+         responseJson.z
       ];
       console.log('current position', currentPosition);
     })
@@ -60,13 +86,14 @@ function fetchNextPosition() {
     });
 }
 
+
 function positionFetch() {
   console.log('fetch!');
   this.setTimeout(() => {
     fetchNextPosition();
     console.log('fetching position');
     positionFetch();
-  }, 500);
+  }, 1000);
 }
 
 var PosterScene = createReactClass({
@@ -94,7 +121,7 @@ var PosterScene = createReactClass({
 
           <ViroNode position={[0, -.1, 0]} scale={[0, 0, 0]} rotation={[-90, 0, 0]} dragType="FixedToWorld" onDrag={() => { }}
             animation={{ name: "scaleModel", run: this.state.playAnim, }} >
-            <Viro3DObject
+            <Viro3DObject onLoadEnd={this._onModelLoad}
               source={require('./res/blackpanther/object_bpanther_anim.vrx')}
               resources={[require('./res/blackpanther/object_bpanther_Base_Color.png'),
               require('./res/blackpanther/object_bpanther_Metallic.png'),
@@ -104,9 +131,7 @@ var PosterScene = createReactClass({
               position={currentPosition}
               scale={[.9, .9, .9]}
               animation={{ name: this.state.animationName, run: this.state.modelAnim, loop: this.state.loopState, onFinish: this._onFinish, }}
-              type="VRX"
-              onLoadEnd={this._onModelLoad}
-               />
+              type="VRX" />
 
           </ViroNode>
 
@@ -166,7 +191,7 @@ var PosterScene = createReactClass({
   _onFinish() {
     this.setState({
       animationName: "scaleModel",
-      loopState: true,
+      loopState: false,
     })
   },
 
@@ -197,7 +222,6 @@ var styles = StyleSheet.create({
   },
 });
 
-//Needed for poster tracking.
 ViroARTrackingTargets.createTargets({
   poster: {
     source: require('./res/blackpanther.jpg'),
@@ -206,11 +230,10 @@ ViroARTrackingTargets.createTargets({
   }
 });
 
-
-//this is where animations are registered
 ViroAnimations.registerAnimations({
   scaleModel: {
     properties: { scaleX: 1, scaleY: 1, scaleZ: 1, },
+    easing:"Bounce",
     duration: 1000
   },
 });
